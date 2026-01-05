@@ -1,20 +1,27 @@
-import eslint from '@eslint/js';
-import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import js from '@eslint/js';
+import globals from 'globals';
 
-export default defineConfig(
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-  tseslint.configs.strict,
+export default tseslint.config(
   {
+    ignores: ['**/dist/**', '**/node_modules/**'],
+  },
+  {
+    files: ['**/*.{js,mjs,cjs,ts}'],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_', // Allow parameters starting with underscore
-          varsIgnorePattern: '^_', // Allow variables starting with underscore
-        },
-      ],
+      '@typescript-eslint/await-thenable': 'error',
+      // Add more rules as needed
     },
   },
 );

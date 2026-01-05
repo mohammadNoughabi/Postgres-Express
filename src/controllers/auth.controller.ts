@@ -3,8 +3,6 @@ import authService from '../services/auth.service.ts';
 import { ENV } from '../config/envVariables.ts';
 
 class AuthController {
-  constructor() {}
-
   async registerControl(req: Request, res: Response, next: NextFunction) {
     try {
       const { username, password } = req.body;
@@ -60,7 +58,7 @@ class AuthController {
 
   async logoutControl(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await authService.logoutService();
+      const result = authService.logoutService();
       res.clearCookie('token');
       return res.status(200).json(result);
     } catch (error) {

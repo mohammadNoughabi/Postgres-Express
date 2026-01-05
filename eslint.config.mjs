@@ -1,5 +1,4 @@
 import tseslint from 'typescript-eslint';
-import js from '@eslint/js';
 import globals from 'globals';
 
 export default tseslint.config(
@@ -8,7 +7,6 @@ export default tseslint.config(
   },
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -21,7 +19,32 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/await-thenable': 'error',
-      // Add more rules as needed
+      '@typescript-eslint/no-duplicate-enum-values': 'error',
+      '@typescript-eslint/no-duplicate-type-constituents': 'error',
+      '@typescript-eslint/no-empty-object-type': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-for-in-array': 'error',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        {
+          checksConditionals: true, // Check promises in conditionals
+          checksVoidReturn: true, // Check void-returning promises
+          checksSpreads: true, // Check promises in spread expressions
+        },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-namespace': [
+        'error',
+        {
+          allowDeclarations: false, // Disallow declare namespace
+          allowDefinitionFiles: false, // Disallow even in .d.ts files
+        },
+      ],
     },
   },
 );

@@ -28,7 +28,7 @@ async function main() {
     const environment = ENV.NODE_ENV || 'development';
     app.listen(port, () => {
       console.log(
-        `Server is running in ${environment} mode on http://localhost:${port}`,
+        `✅ Server is running in ${environment} mode on http://localhost:${port}`,
       );
     });
   } catch (error) {
@@ -37,6 +37,6 @@ async function main() {
   }
 }
 
-main();
+void main();
 
 export default app;

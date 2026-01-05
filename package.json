@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node --env-file=.env dist/index.js",
-    "dev": "tsx --env-file=.env --watch src/index.ts",
+    "start": "node --env-file=production.env dist/index.js",
+    "dev": "tsx --env-file=development.env --watch src/index.ts",
     "prepare": "husky"
   },
   "lint-staged": {

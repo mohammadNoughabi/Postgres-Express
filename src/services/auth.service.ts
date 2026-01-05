@@ -1,11 +1,10 @@
 import User from '../repositories/user.repository.ts';
+import type IUser from '../interfaces/IUser.ts';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/envVariables.ts';
 
 class AuthService {
-  constructor() {}
-
   // -------------------
   // Register service
   // -------------------
@@ -21,12 +20,11 @@ class AuthService {
     }
 
     // Hashing password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPass = await bcrypt.hash(password, salt);
+    const salt: string = await bcrypt.genSalt(10);
+    const hashedPass: string = await bcrypt.hash(password, salt);
 
     // Create new user
-    const user = new User(username, hashedPass);
-    const createdUser = await user.createUser();
+    const createdUser: IUser = new User(username, hashedPass);
 
     return {
       success: true,
@@ -39,13 +37,13 @@ class AuthService {
   // Login service
   // -------------------
   async loginService(username: string, password: string) {
-    const user = await User.findUserByUsername(username);
+    const user: IUser | null = await User.findUserByUsername(username);
     if (!user) {
       return { success: false, message: 'Invalid username or password' };
     }
 
     // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return {
         success: false,
@@ -72,7 +70,7 @@ class AuthService {
   // -------------------
   // Logout service
   // -------------------
-  async logoutService() {
+  logoutService() {
     return { success: true, message: 'Logout successful' };
   }
 }

@@ -3,7 +3,7 @@ import type IUser from '../interfaces/IUser.ts';
 import { v4 as uuidv4 } from 'uuid';
 
 class User implements IUser {
-  id: string;
+  readonly id: string;
   username: string;
   password: string;
 
@@ -11,27 +11,6 @@ class User implements IUser {
     this.id = id;
     this.username = username;
     this.password = password;
-  }
-
-  // ----------------------
-  // Create new user
-  // ----------------------
-  async createUser(): Promise<IUser | unknown> {
-    try {
-      const query = `
-    INSERT INTO users (id , username ,password) 
-    VALUES ($1 , $2 , $3) 
-    RETURNING id , username , password`;
-
-      const values = [this.id, this.username, this.password];
-
-      const result = await pool.query(query, values);
-      const { password, ...safeUser } = result.rows[0];
-      return safeUser;
-    } catch (error) {
-      console.error(error);
-      return error;
-    }
   }
 
   // -----------------------

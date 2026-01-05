@@ -9,7 +9,7 @@ export const authenticateToken = (
   next: NextFunction,
 ) => {
   try {
-    const token = req.cookies?.token;
+    const token: string = req.cookies?.token;
     if (!token) {
       return res
         .status(401)

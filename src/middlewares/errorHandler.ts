@@ -4,6 +4,7 @@ import type {
   NextFunction,
   ErrorRequestHandler,
 } from 'express';
+import { ENV } from '../config/envVariables.ts';
 
 export const errorHandler: ErrorRequestHandler = (
   err,
@@ -17,6 +18,6 @@ export const errorHandler: ErrorRequestHandler = (
     success: false,
     status,
     message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : {},
+    stack: ENV.NODE_ENV === 'development' ? err.stack : {},
   });
 };

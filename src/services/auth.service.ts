@@ -7,7 +7,11 @@ class AuthService {
   // -------------------
   // Register service
   // -------------------
-  async registerService(username: string, password: string) {
+  async registerService(
+    username: string,
+    password: string,
+    role: 'regular' | 'admin' = 'regular',
+  ) {
     // Check if user exists
     const existingUser = await User.findUserByUsername(username);
     if (existingUser) {
@@ -22,8 +26,15 @@ class AuthService {
     const salt: string = await bcrypt.genSalt(10);
     const hashedPass: string = await bcrypt.hash(password, salt);
 
-    // Create new user
-    const createdUser: IUser = new User(username, hashedPass);
+    // Create new user with role
+    const createdUser = await User.createUser(username, hashedPass, role);
+
+    if (!createdUser) {
+      return {
+        success: false,
+        message: 'Failed to create user',
+      };
+    }
 
     return {
       success: true,
@@ -66,6 +77,41 @@ class AuthService {
       refreshToken,
       user: { id: user.id, username: user.username },
     };
+  }
+
+  // -------------------
+  // Refresh token service
+  // -------------------
+  async refreshTokenService(refreshToken: string) {
+    try {
+      const decoded = JwtService.validateRefreshToken(refreshToken);
+
+      // Generate new access token
+      const user = await User.findUserById(decoded.id);
+      if (!user) {
+        return {
+          success: false,
+          message: 'User not found',
+        };
+      }
+
+      const newAccessToken = JwtService.generateAccessToken({
+        id: user.id,
+        username: user.username,
+        role: user.role || 'regular',
+      });
+
+      return {
+        success: true,
+        accessToken: newAccessToken,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        message: 'Invalid or expired refresh token',
+      };
+    }
   }
 }
 

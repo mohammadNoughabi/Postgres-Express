@@ -24,7 +24,7 @@ const authorizeRole = (...allowedRoles: string[]) => {
         });
       }
 
-      // Fetch user role from database (more secure)
+      // Fetch user role from database
       const userRole = await User.getUserRoleById(req.user.id);
 
       if (!userRole) {

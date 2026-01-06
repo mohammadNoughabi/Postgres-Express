@@ -6,8 +6,9 @@ export async function initDatabase(): Promise<void> {
         CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY ,
         username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-        )
+        password TEXT NOT NULL,
+        role VARCHAR(20) NOT NULL DEFAULT 'regular'
+        );
         `;
 
     await pool.query(createUsersTableQuery);

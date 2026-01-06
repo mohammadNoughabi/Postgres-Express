@@ -6,5 +6,8 @@ export const ENV = {
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_DATABASE: process.env.DB_DATABASE,
-  JWT_SECRET: String(process.env.JWT_SECRET),
+  ACCESS_TOKEN_SECRET: String(process.env.ACCESS_TOKEN_SECRET),
+  REFRESH_TOKEN_SECRET: String(process.env.REFRESH_TOKEN_SECRET),
+  ACCESS_TOKEN_EXPIRES_IN: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+  REFRESH_TOKEN_EXPIRES_IN: Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
 };

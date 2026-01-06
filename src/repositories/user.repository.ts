@@ -6,11 +6,18 @@ class User implements IUser {
   readonly id: string;
   username: string;
   password: string;
+  role: 'regular' | 'admin';
 
-  constructor(username: string, password: string, id: string = uuidv4()) {
+  constructor(
+    username: string,
+    password: string,
+    role: 'regular' | 'admin' = 'regular',
+    id: string = uuidv4(),
+  ) {
     this.id = id;
     this.username = username;
     this.password = password;
+    this.role = role;
   }
 
   // -----------------------
@@ -34,6 +41,29 @@ class User implements IUser {
     } catch (error) {
       console.error(error);
       return false;
+    }
+  }
+
+  // -----------------------
+  // Static : Create new user
+  // -----------------------
+  static async createUser(
+    username: string,
+    password: string,
+    role: 'regular' | 'admin' = 'regular',
+  ): Promise<IUser | null> {
+    try {
+      const id: string = uuidv4();
+      const query = `
+      INSERT INTO users (id , username , password , role)
+      VALUES ($1 , $2 , $3 , $4)
+      RETURNING (id , username , role);
+      `;
+      const result = await pool.query(query, [id, username, password, role]);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   }
 
@@ -69,6 +99,25 @@ class User implements IUser {
 
       const result = await pool.query(query, [id]);
       return result.rows[0] || null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  // -----------------------
+  // Static: Get user role by id
+  // -----------------------
+  static async getUserRoleById(id: string): Promise<string | null> {
+    try {
+      const query = `
+      SELECT role
+      FROM users 
+      WHERE id = $1;
+      `;
+
+      const result = await pool.query(query, [id]);
+      return result.rows[0]?.role || null;
     } catch (error) {
       console.error(error);
       return null;

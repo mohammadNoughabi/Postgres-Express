@@ -1,8 +1,7 @@
 import User from '../repositories/user.repository.ts';
 import type IUser from '../interfaces/IUser.ts';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { ENV } from '../config/envVariables.ts';
+import JwtService from './jwt.service.ts';
 
 class AuthService {
   // -------------------
@@ -51,27 +50,22 @@ class AuthService {
       };
     }
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      ENV.JWT_SECRET,
-      {
-        expiresIn: '1d',
-      },
-    );
+    const accessToken: string = JwtService.generateAccessToken({
+      id: user.id,
+      username: user.username,
+    });
+    const refreshToken: string = JwtService.generateRefreshToken({
+      id: user.id,
+      username: user.username,
+    });
 
     return {
       success: true,
       message: 'Login successful',
-      token,
+      accessToken,
+      refreshToken,
       user: { id: user.id, username: user.username },
     };
-  }
-
-  // -------------------
-  // Logout service
-  // -------------------
-  logoutService() {
-    return { success: true, message: 'Logout successful' };
   }
 }
 

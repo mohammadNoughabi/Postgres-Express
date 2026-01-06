@@ -5,7 +5,8 @@ import { ENV } from '../config/envVariables.ts';
 class AuthController {
   async registerControl(req: Request, res: Response, next: NextFunction) {
     try {
-      const { username, password } = req.body;
+      const username: string = req.body.username;
+      const password: string = req.body.password;
       if (!username || !password) {
         return res.status(400).json({
           success: false,
@@ -28,7 +29,8 @@ class AuthController {
 
   async loginControl(req: Request, res: Response, next: NextFunction) {
     try {
-      const { username, password } = req.body;
+      const username: string = req.body.username;
+      const password: string = req.body.password;
       if (!username || !password) {
         return res.status(400).json({
           success: false,
@@ -42,7 +44,14 @@ class AuthController {
         return res.status(400).json(result);
       }
 
-      res.cookie('token', result.token, {
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: ENV.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
         secure: ENV.NODE_ENV === 'production',
         sameSite: 'strict',
@@ -56,11 +65,13 @@ class AuthController {
     }
   }
 
-  async logoutControl(req: Request, res: Response, next: NextFunction) {
+  logoutControl(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = authService.logoutService();
-      res.clearCookie('token');
-      return res.status(200).json(result);
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+      return res
+        .status(200)
+        .json({ success: true, message: 'Logout successful' });
     } catch (error) {
       console.error(error);
       next(error);

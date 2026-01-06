@@ -1,36 +1,60 @@
 import type { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import type { JwtPayload, VerifyErrors } from 'jsonwebtoken';
-import { ENV } from '../config/envVariables.ts';
+import JwtService from '../services/jwt.service.ts';
 
-export const authenticateToken = (
-  req: Request,
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    username: string;
+    [key: string]: unknown;
+  };
+}
+
+const authenticateToken = (
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const token: string = req.cookies?.token;
+    const token: string = req.cookies.accessToken;
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, message: 'Access denied. No token provided' });
+        .json({ success: false, message: 'Access token is required' });
     }
-    jwt.verify(
-      token,
-      ENV.JWT_SECRET,
-      (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
-        if (err) {
-          return res
-            .status(403)
-            .json({ success: false, message: 'Invalid or expired token' });
+
+    try {
+      const decoded = JwtService.validateAccessToken(token);
+      req.user = {
+        id: decoded.id,
+        username: decoded.username,
+      };
+      next();
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'TokenExpiredError') {
+          return res.status(401).json({
+            success: false,
+            message: 'Access token has expired',
+          });
         }
-        // Assign decoded payload to req.user
-        req.user = decoded as JwtPayload;
-        next();
-      },
-    );
+
+        if (error.name === 'JsonWebTokenError') {
+          return res.status(403).json({
+            success: false,
+            message: 'Invalid access token',
+          });
+        }
+      }
+
+      return res.status(403).json({
+        success: false,
+        message: 'Failed to authenticate token',
+      });
+    }
   } catch (error) {
-    console.error(error);
+    console.error('Authentication Error :', error);
     next(error);
   }
 };
+
+export default authenticateToken;
